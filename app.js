@@ -60,8 +60,18 @@ async function makeTeam() {
                 console.log(manager);
             })
 
+    await inquirer.prompt(
+        {
+            type: Number,
+            message: 'How many engineers are on the team?',
+            name: 'numEng'
+        }
+    ).then(function ({numEng}) {
 
+        console.log('Ok, you have ' + numEng + ' engineers');
+    })
 
+    console.log('Still have ' + numEng);
 
     await inquirer.prompt([
         {
@@ -89,7 +99,7 @@ async function makeTeam() {
             const email = empData.empEmail;
             const role = empData.empRole;
 
-            const employee = new Employee(id, name, email, role);
+            const employee = new Employee(id, name, email, role); // CHECK HERE.  DON'T MAKE EMPLOYEE, MAKE INTERN/ENGINEER??
 
             console.log(employee);
 
