@@ -3,7 +3,6 @@ const inquirer = require("inquirer");
 const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
 
-const Employee = require('./lib/employee');
 const Manager = require('./lib/manager');
 const Engineer = require('./lib/engineer');
 const Intern = require('./lib/intern');
@@ -77,6 +76,10 @@ async function managerInfo() {
 
 
 
+
+
+
+
 // This code prompts for the number of Engineers
 
 async function engSize() {
@@ -103,6 +106,9 @@ async function engSize() {
 
 async function loopEng(numEng) {
     console.log('Still have ' + numEng);
+
+    let engineers = [];
+
 
     for (var e = 0; e < numEng; e++) {
 
@@ -136,12 +142,20 @@ async function loopEng(numEng) {
                     const engineer = new Engineer(id, name, email, github);
 
                     console.log(engineer);
+
+engineers.push(engineer)
                 }
             )
     }
 
+    console.log('-------Engineer Array--------');
+    console.log(engineers);
+
     noobSize();
+
 }
+
+
 
 
 
@@ -172,10 +186,12 @@ async function noobSize() {
 
 
 
-//This code takes Engineer info by looping through prompts
+//This code takes Intern info by looping through prompts
 
 async function loopNoob(numNoob) {
     console.log('You have ' + numNoob + 'interns.');
+
+    let interns = [];
 
     for (var n = 0; n < numNoob; n++) {
 
@@ -209,12 +225,19 @@ async function loopNoob(numNoob) {
                     const intern = new Intern(id, name, email, school);
 
                     console.log(intern);
+
+                    interns.push(intern);
+
                 }
             )
     }
 
-    // nextFunc(intern);
+    console.log('-----------Intern Array------------');
+    console.log(interns);
+
 }
+
+
 
 
 
