@@ -5,10 +5,13 @@ const writeFileAsync = util.promisify(fs.writeFile);
 
 const Employee = require('./lib/employee');
 const Manager = require('./lib/manager');
-// const Engineer = require('./lib/engineer');
-// const Intern = require('./lib/intern');
+const Engineer = require('./lib/engineer');
+const Intern = require('./lib/intern');
 
 
+
+
+//This code prompts for team name
 
 async function makeTeam() {
     await inquirer
@@ -25,10 +28,16 @@ async function makeTeam() {
 
         })
 
+    managerInfo();
+
+}
 
 
 
 
+// This code gathers info on the Manager
+
+async function managerInfo() {
     await inquirer
         .prompt([
             {
@@ -60,51 +69,7 @@ async function makeTeam() {
                 console.log(manager);
             })
 
-    await inquirer.prompt(
-        {
-            type: Number,
-            message: 'How many engineers are on the team?',
-            name: 'numEng'
-        }
-    ).then(function ({numEng}) {
-
-        console.log('Ok, you have ' + numEng + ' engineers');
-    })
-
-    console.log('Still have ' + numEng);
-
-    await inquirer.prompt([
-        {
-            message: 'Enter an employee name: ',
-            name: 'empName'
-        },
-        {
-            message: 'Enter the employee ID#: ',
-            name: 'empID'
-        },
-        {
-            message: 'Enter the employee Email: ',
-            name: 'empEmail'
-        },
-        {
-            type: 'list',
-            message: 'Enter the employee Role: ',
-            name: 'empRole',
-            choices: ['Engineer', 'Intern']
-        }
-    ]).then(
-        function (empData) {
-            const name = empData.empName;
-            const id = empData.empID;
-            const email = empData.empEmail;
-            const role = empData.empRole;
-
-            const employee = new Employee(id, name, email, role); // CHECK HERE.  DON'T MAKE EMPLOYEE, MAKE INTERN/ENGINEER??
-
-            console.log(employee);
-
-        }
-    )
+    engSize();
 
 }
 
@@ -112,21 +77,147 @@ async function makeTeam() {
 
 
 
+// This code prompts for the number of Engineers
+
+async function engSize() {
+    await inquirer.prompt(
+        {
+            type: Number,
+            message: 'How many engineers are on the team?',
+            name: 'numEng'
+        }
+    ).then(function ({ numEng }) {
+
+        console.log('Ok, you have ' + numEng + ' engineers');
+
+        loopEng(numEng);
+    })
+
+}
+
+
+
+
+
+//This code takes Engineer info by looping through prompts
+
+async function loopEng(numEng) {
+    console.log('Still have ' + numEng);
+
+    for (var e = 0; e < numEng; e++) {
+
+        let i = e + 1;
+
+        await
+            inquirer.prompt([
+                {
+                    message: 'Enter name for Engineer ' + i + ':',
+                    name: 'engName'
+                },
+                {
+                    message: 'Enter ID for Engineer ' + i + ':',
+                    name: 'engID'
+                },
+                {
+                    message: 'Enter email for Engineer ' + i + ':',
+                    name: 'engEmail'
+                },
+                {
+                    message: 'Enter GitHub id for Engineer ' + i + ':',
+                    name: 'engGithub',
+                }
+            ]).then(
+                function (engData) {
+                    const name = engData.engName;
+                    const id = engData.engID;
+                    const email = engData.engEmail;
+                    const github = engData.engGithub;
+
+                    const engineer = new Engineer(id, name, email, github);
+
+                    console.log(engineer);
+                }
+            )
+    }
+
+    noobSize();
+}
+
+
+
+
+
+
+// This code prompts for number of Interns
+
+
+async function noobSize() {
+    await inquirer.prompt(
+        {
+            type: Number,
+            message: 'How many interns are on the team?',
+            name: 'numNoob'
+        }
+    ).then(function ({ numNoob }) {
+
+        console.log('Ok, you have ' + numNoob + ' interns');
+
+        loopNoob(numNoob);
+    })
+
+}
+
+
+
+
+
+
+//This code takes Engineer info by looping through prompts
+
+async function loopNoob(numNoob) {
+    console.log('You have ' + numNoob + 'interns.');
+
+    for (var n = 0; n < numNoob; n++) {
+
+        let g = n + 1;
+
+        await
+            inquirer.prompt([
+                {
+                    message: 'Enter name for Intern ' + g + ':',
+                    name: 'intName'
+                },
+                {
+                    message: 'Enter ID for Intern ' + g + ':',
+                    name: 'intID'
+                },
+                {
+                    message: 'Enter email for Intern ' + g + ':',
+                    name: 'intEmail'
+                },
+                {
+                    message: 'Enter school for Intern ' + g + ':',
+                    name: 'intSchool',
+                }
+            ]).then(
+                function (intData) {
+                    const name = intData.intName;
+                    const id = intData.intID;
+                    const email = intData.intEmail;
+                    const school = intData.intSchool;
+
+                    const intern = new Intern(id, name, email, school);
+
+                    console.log(intern);
+                }
+            )
+    }
+
+    // nextFunc(intern);
+}
+
+
+
+
 makeTeam();
 
-
-// Prompt for Name
-
-// Prompt for ID
-
-// Promp for Email
-
-// Prompt for Role
-
-// If Role === Manager, check hasManager, then set hasManager to true or return 'already have', Prompt for Office Number
-
-// If Role === Engineer, Prompt for GitHub
-
-// If Role === Intern, Prompt for School
-
-// Prompt for more employees?   If yes, new instance, if no, render html
