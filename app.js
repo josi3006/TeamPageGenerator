@@ -1,9 +1,5 @@
 const fs = require("fs");
 const inquirer = require("inquirer");
-const util = require("util");
-const writeFileAsync = util.promisify(fs.writeFile);
-const puppeteer = require("puppeteer");
-
 
 const Manager = require('./lib/manager');
 const Engineer = require('./lib/engineer');
@@ -35,7 +31,7 @@ async function makeTeam() {
 }
 
 
-
+let allHTML = "";
 
 // This code gathers info on the Manager
 
@@ -68,16 +64,13 @@ async function managerInfo(teamname) {
 
                 const manager = new Manager(id, name, email, officeNumber);
 
-                console.log(manager);
+                indivEmpl = fs.readFileSync("templates/manager.html");
+                allHTML = allHTML + "\n" + eval('`' + indivEmpl + '`');
 
                 engSize(manager, teamname);
 
             })
-
-
 }
-
-
 
 
 
@@ -96,8 +89,6 @@ async function engSize(manager, teamname) {
         }
     ).then(function ({ numEng }) {
 
-        console.log('Ok, you have ' + numEng + ' engineers');
-
         loopEng(numEng, manager, teamname);
     })
 
@@ -110,7 +101,6 @@ async function engSize(manager, teamname) {
 //This code takes Engineer info by looping through prompts
 
 async function loopEng(numEng, manager, teamname) {
-    console.log('Still have ' + numEng);
 
     let engineers = [];
 
@@ -146,15 +136,16 @@ async function loopEng(numEng, manager, teamname) {
 
                     const engineer = new Engineer(id, name, email, github);
 
-                    console.log(engineer);
+                    indivEmpl = fs.readFileSync("templates/engineer.html");
+                    allHTML = allHTML + "\n" + eval('`' + indivEmpl + '`');
 
                     engineers.push(engineer)
+
                 }
             )
     }
 
-    console.log('-------Engineer Array--------');
-    console.log(engineers);
+
 
     noobSize(engineers, numEng, manager, teamname);
 
@@ -169,7 +160,6 @@ async function loopEng(numEng, manager, teamname) {
 
 // This code prompts for number of Interns
 
-
 async function noobSize(engineers, numEng, manager, teamname) {
     await inquirer.prompt(
         {
@@ -178,8 +168,6 @@ async function noobSize(engineers, numEng, manager, teamname) {
             name: 'numNoob'
         }
     ).then(function ({ numNoob }) {
-
-        console.log('Ok, you have ' + numNoob + ' interns');
 
         loopNoob(numNoob, engineers, numEng, manager, teamname);
     })
@@ -194,7 +182,6 @@ async function noobSize(engineers, numEng, manager, teamname) {
 //This code takes Intern info by looping through prompts
 
 async function loopNoob(numNoob, engineers, numEng, manager, teamname) {
-    console.log('You have ' + numNoob + 'interns.');
 
     let interns = [];
 
@@ -229,7 +216,8 @@ async function loopNoob(numNoob, engineers, numEng, manager, teamname) {
 
                     const intern = new Intern(id, name, email, school);
 
-                    console.log(intern);
+                    indivEmpl = fs.readFileSync("templates/intern.html");
+                    allHTML = allHTML + "\n" + eval('`' + indivEmpl + '`');
 
                     interns.push(intern);
 
@@ -237,83 +225,25 @@ async function loopNoob(numNoob, engineers, numEng, manager, teamname) {
             )
     }
 
-    console.log('-----------Intern Array------------');
-    console.log(interns);
+    const bigHTML = fs.readFileSync("templates/compiled.html");
 
-    writeFile(interns, numNoob, engineers, numEng, manager, teamname)
+    allHTML = eval('`' + bigHTML + '`');
 
-    const data = generateHTML(interns, numNoob, engineers, numEng, manager, teamname);
+    fs.writeFile("output/index.html", allHTML, function (err) {
 
-    writeFile(data);
-
-}
-
-
-
-
-
-function generateHTML(interns, numNoob, engineers, numEng, manager, teamname) {
-
-
-    return `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Document</title>
-        <script src="index.js" defer></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src='https://kit.fontawesome.com/22772263e9.js' crossorigin='anonymous'></script>
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    </head>
-    <body>
-
-    <div class='container container-fluid justify-content-center'>
-
-        <div class='row justify-content-center'>                        
-            <div class='jumbotron'>
-            <h1>${teamname}</h1>
-            </div>
-        </div>
-
-        <div class='row justify-content-center'>
-            <div class='col-3'>
-                <div class='card'>
-                    <div class='card-body rounded'>
-                        <h4 class='card-title text-white text-center'>Manager</h3>
-                        <p>${manager}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    
-    
-    
-    </body>
-    </html>
-    `
-    // writeFile(allData);
-
-}
-
-
-function writeFile(data) {
-    writeFileAsync("profile.html", data)
-        .then((async () => {
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.setContent(data);
+        if (err) {
+            return console.log(err);
         }
-        )
-        );
 
+        console.log("Done! Ready to Open!");
+    });
 }
+
+
+
+
+
+
 
 makeTeam();
 
