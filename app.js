@@ -145,12 +145,11 @@ async function loopEng(numEng, manager, teamname) {
             )
     }
 
-
+allHTML = allHTML + '</div><div class="row justify-content-center">';
 
     noobSize(engineers, numEng, manager, teamname);
 
 }
-
 
 
 
@@ -224,6 +223,8 @@ async function loopNoob(numNoob, engineers, numEng, manager, teamname) {
                 }
             )
     }
+
+    allHTML = allHTML + '</div>';
 
     const bigHTML = fs.readFileSync("templates/compiled.html");
 
