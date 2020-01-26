@@ -2,6 +2,8 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 const util = require("util");
 const writeFileAsync = util.promisify(fs.writeFile);
+const puppeteer = require("puppeteer");
+
 
 const Manager = require('./lib/manager');
 const Engineer = require('./lib/engineer');
@@ -25,9 +27,10 @@ async function makeTeam() {
             console.log(teamname + ' is a great name!');
 
 
+            managerInfo(teamname);
+
         })
 
-    managerInfo();
 
 }
 
@@ -36,7 +39,7 @@ async function makeTeam() {
 
 // This code gathers info on the Manager
 
-async function managerInfo() {
+async function managerInfo(teamname) {
     await inquirer
         .prompt([
             {
@@ -66,9 +69,11 @@ async function managerInfo() {
                 const manager = new Manager(id, name, email, officeNumber);
 
                 console.log(manager);
+
+                engSize(manager, teamname);
+
             })
 
-    engSize();
 
 }
 
@@ -82,7 +87,7 @@ async function managerInfo() {
 
 // This code prompts for the number of Engineers
 
-async function engSize() {
+async function engSize(manager, teamname) {
     await inquirer.prompt(
         {
             type: Number,
@@ -93,7 +98,7 @@ async function engSize() {
 
         console.log('Ok, you have ' + numEng + ' engineers');
 
-        loopEng(numEng);
+        loopEng(numEng, manager, teamname);
     })
 
 }
@@ -104,7 +109,7 @@ async function engSize() {
 
 //This code takes Engineer info by looping through prompts
 
-async function loopEng(numEng) {
+async function loopEng(numEng, manager, teamname) {
     console.log('Still have ' + numEng);
 
     let engineers = [];
@@ -143,7 +148,7 @@ async function loopEng(numEng) {
 
                     console.log(engineer);
 
-engineers.push(engineer)
+                    engineers.push(engineer)
                 }
             )
     }
@@ -151,7 +156,7 @@ engineers.push(engineer)
     console.log('-------Engineer Array--------');
     console.log(engineers);
 
-    noobSize();
+    noobSize(engineers, numEng, manager, teamname);
 
 }
 
@@ -165,7 +170,7 @@ engineers.push(engineer)
 // This code prompts for number of Interns
 
 
-async function noobSize() {
+async function noobSize(engineers, numEng, manager, teamname) {
     await inquirer.prompt(
         {
             type: Number,
@@ -176,7 +181,7 @@ async function noobSize() {
 
         console.log('Ok, you have ' + numNoob + ' interns');
 
-        loopNoob(numNoob);
+        loopNoob(numNoob, engineers, numEng, manager, teamname);
     })
 
 }
@@ -188,7 +193,7 @@ async function noobSize() {
 
 //This code takes Intern info by looping through prompts
 
-async function loopNoob(numNoob) {
+async function loopNoob(numNoob, engineers, numEng, manager, teamname) {
     console.log('You have ' + numNoob + 'interns.');
 
     let interns = [];
@@ -235,12 +240,80 @@ async function loopNoob(numNoob) {
     console.log('-----------Intern Array------------');
     console.log(interns);
 
+    writeFile(interns, numNoob, engineers, numEng, manager, teamname)
+
+    const data = generateHTML(interns, numNoob, engineers, numEng, manager, teamname);
+
+    writeFile(data);
+
 }
 
 
 
 
 
+function generateHTML(interns, numNoob, engineers, numEng, manager, teamname) {
+
+
+    return `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <script src="index.js" defer></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src='https://kit.fontawesome.com/22772263e9.js' crossorigin='anonymous'></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+
+    <div class='container container-fluid justify-content-center'>
+
+        <div class='row justify-content-center'>                        
+            <div class='jumbotron'>
+            <h1>${teamname}</h1>
+            </div>
+        </div>
+
+        <div class='row justify-content-center'>
+            <div class='col-3'>
+                <div class='card'>
+                    <div class='card-body rounded'>
+                        <h4 class='card-title text-white text-center'>Manager</h3>
+                        <p>${manager}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    
+    
+    
+    </body>
+    </html>
+    `
+    // writeFile(allData);
+
+}
+
+
+function writeFile(data) {
+    writeFileAsync("profile.html", data)
+        .then((async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.setContent(data);
+        }
+        )
+        );
+
+}
 
 makeTeam();
 
