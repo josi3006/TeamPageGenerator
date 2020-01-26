@@ -237,7 +237,12 @@ async function loopNoob(numNoob, engineers, numEng, manager, teamname) {
         }
 
         console.log("Done! Ready to Open!");
+
+ 
+
     });
+
+
 }
 
 
