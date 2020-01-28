@@ -23,6 +23,7 @@
   "dependencies": {
     "inquirer": "^7.0.3",
     "jest": "^25.1.0",
-    "puppeteer": "^2.0.0"
+    "puppeteer": "^2.0.0",
+    "test": "^0.6.0"
   }
 }
